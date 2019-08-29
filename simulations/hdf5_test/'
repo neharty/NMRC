@@ -1,0 +1,39 @@
+from __future__ import absolute_import, division, print_function
+import numpy as np
+from radiotools import helper as hp
+from radiotools import plthelpers as php
+from matplotlib import pyplot as plt
+from NuRadioMC.utilities import units
+import h5py
+import argparse
+import json
+import time
+import os
+
+parser = argparse.ArgumentParser(description='Plot NuRadioMC event list input')
+parser.add_argument('inputfilename', type=str,
+                    help='path to NuRadioMC hdf5 simulation input')
+# parser.add_argument('outputfilename', type=str,
+#                     help='name of output file storing the electric field traces at detector positions')
+args = parser.parse_args()
+
+fin = h5py.File(args.inputfilename, 'r')
+# plot vertex distribution
+fig, ax = plt.subplots(2, 1)
+xx = np.array(fin['xx'])
+yy = np.array(fin['yy'])
+zz = np.array(fin['zz'])
+h1 = ax.hist2d(xx / units.m, yy / units.m, bins=[np.arange(0, 10000, 100), np.arange(-3000, 0, 100)],
+              cmap=plt.get_cmap('Blues'))
+h2 = ax.hist2d(xx / units.m, zz / units.m, bins=[np.arange(0, 10000, 100), np.arange(-3000, 0, 100)],
+              cmap=plt.get_cmap('Blues'))
+cb = plt.colorbar(h[3], ax=ax)
+cb.set_label("number of events")
+ax.set_aspect('equal')
+ax.set_xlabel("r [m]")
+ax.set_ylabel("z [m]")
+fig.tight_layout()
+plt.title('vertex distribution')
+plt.show()
+#plt.savefig("output/simInputVertex.pdf")
+
